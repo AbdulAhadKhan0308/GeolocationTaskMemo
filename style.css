@@ -43,9 +43,21 @@ a:visited {
   color: var(--color-brand--1);
 }
 
+/* MAP_APP */
+#map_app {
+    display: flex; 
+    justify-content: flex-start;
+    width: 100%;
+}
+
+/* EXP. TEXT */
+#first-child {
+  flex: "0 0 5%"
+}
+
 /* SIDEBAR */
 .sidebar {
-  flex-basis: 60rem;
+  flex: 1;
   background-color: var(--color-dark--1);
   padding: 3rem 5rem 4rem 5rem;
   display: flex;

@@ -97,74 +97,7 @@ class UsedMarker extends Marker {
       .openPopup();
   }
 }
-class Task {
-  #date;
-  #time;
-  #lat;
-  #lng;
-  #JSONDataObj;
 
-  constructor(date, time, lat, lng, propName, propVal) {
-    if (this.constructor === Task)
-      throw new Error('Task cannot be instantiated directly');
-
-    this.#date = date;
-    this.#time = time;
-    this.#lat = lat;
-    this.#lng = lng;
-    //private field is constructed dynamically as we pass args in constructor
-    if (!!propName && !!propVal) this[`#${propName}`] = propVal;
-
-    const obj = {};
-    obj.date = date;
-    obj.time = time;
-    obj.className = this.constructor.name;
-    obj.lat = lat;
-    obj.lng = lng;
-    if (!!propName && !!propVal) obj[`${propName}`] = propVal;
-    this.#JSONDataObj = JSON.stringify(obj);
-  }
-
-  get JSONDataObj() {
-    return this.#JSONDataObj;
-  }
-}
-
-class Study extends Task {
-  constructor(date, time, lat, lng, propVal) {
-    super(date, time, lat, lng, 'isCoursework', propVal);
-  }
-}
-
-class Shop extends Task {
-  constructor(date, time, lat, lng, propVal) {
-    super(date, time, lat, lng, 'budget', propVal);
-  }
-}
-
-class Workout extends Task {
-  constructor(date, time, lat, lng, propVal) {
-    super(date, time, lat, lng, 'caloriesBurnt', propVal);
-  }
-}
-
-class BusinessMeet extends Task {
-  constructor(date, time, lat, lng, propVal) {
-    super(date, time, lat, lng, 'expectedSuccessPercent', propVal);
-  }
-}
-
-class FriendMeet extends Task {
-  constructor(date, time, lat, lng, propVal) {
-    super(date, time, lat, lng, 'expectedExpenses', propVal);
-  }
-}
-
-class OtherTask extends Task {
-  constructor(date, time, lat, lng, propVal) {
-    super(date, time, lat, lng, 'comment', propVal);
-  }
-}
 
 ///////////////////////////////////////////
 //could be done with a "visible class" from css for the "other" form field that appears only one one of them
@@ -247,11 +180,18 @@ const renderList = function () {
   globalUsedMarkersArray = [];
 
   //retrieve elements form localStorage and insert in memoElem
+  console.log("localStorage.length",localStorage.length);
+
   for (let i = 0; i < localStorage.length; i++) {
     const keyCol = localStorage.key(i);
+    console.log("keyCol",keyCol);
+
     if (keyCol !== 'marker') {
+      console.log("no marker")
       const obj = JSON.parse(localStorage.getItem(keyCol));
+      console.log("obj",obj);
       const { date, time, lat, lng, className } = obj;
+      console.log("className",className);
 
       let OtherProperty = Object.values(obj)[5];
       if (!OtherProperty) OtherProperty = '';

@@ -1,0 +1,2 @@
+no lock file
+localStorage uses .key(), if other keys were setup in the page by an extension etc., it would fail
