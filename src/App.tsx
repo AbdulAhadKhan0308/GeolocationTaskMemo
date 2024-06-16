@@ -5,7 +5,7 @@ import { Map } from './components/Map';
 export const App: React.FC = () => {
   return (
     <>
-      <div id="first-child">{'hi in reacted'}</div>
+      <div id="first-child">{'hi changed in reacted'}</div>
       <SideBar />
       <Map />
     </>

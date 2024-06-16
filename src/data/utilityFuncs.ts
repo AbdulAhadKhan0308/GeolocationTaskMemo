@@ -1,4 +1,5 @@
-export const isValidDate = function (date) {
+// date is string in yyyy-mm-dd
+export const isValidDate = function (date: string) {
   if (date.length > 10 || date.length < 10) return false;
 
   let i = 0;
@@ -28,3 +29,16 @@ export const isValidDate = function (date) {
   }
   return true;
 };
+
+export function storageAvailable(type: 'localStorage' | 'sessionStorage') {
+  let storage;
+  try {
+    storage = window[type];
+    const x = '__storage_test__';
+    storage.setItem(x, x);
+    storage.removeItem(x);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}

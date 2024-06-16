@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as L from 'leaflet';
+import { UnusedMarker } from '../markers/MarkerClasses';
 
 export const Map: React.FC = () => {
   React.useEffect(() => {
@@ -18,11 +19,10 @@ export const Map: React.FC = () => {
               '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
           }).addTo(map);
 
-          //an unused marker is created and taken off the map
-          // new UnusedMarker(L, map, 0, 0);
-          // UnusedMarker.instance.removeFromMap();
-          // //render marker at unused position (if it was attached to map at a location and page was exited)
-          // renderUnusedMarker();
+          // an unused marker is created
+          new UnusedMarker(map, 0, 0);
+          //render marker at unused position (if it was attached to map at a location and page was exited)
+          UnusedMarker.instance?.attachToPrevMapCoords();
 
           // //render if some list objects were there in local storage
           // renderList();
@@ -31,10 +31,8 @@ export const Map: React.FC = () => {
             console.log('map clicked');
             //   form.classList.remove('hidden');
             //   dateInput.focus();
-            //   const { lat, lng } = mapEvent.latlng;
-            //   UnusedMarker.instance.removeFromMap();
-            //   UnusedMarker.instance.attachToMapCoords(lat, lng);
-            //   modifyStorageValueOfUnusedMarker();
+            const { lat, lng } = mapEvent.latlng;
+            UnusedMarker.instance?.attachToMapCoords(lat, lng);
           });
         },
         function () {

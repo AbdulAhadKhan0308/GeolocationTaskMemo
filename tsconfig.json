@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+      "outDir": "./dist",
+      "module": "esnext",
+      "target": "esnext",
+      "jsx": "react",
+      "allowJs": false,
+      "sourceMap": true,
+      "esModuleInterop": true,
+      "skipLibCheck": true,
+      "strict": true,
+      "strictPropertyInitialization": false
+    },
+    "exclude": [
+      "node_modules"
+    ]
+  }

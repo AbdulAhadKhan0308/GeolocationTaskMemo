@@ -132,16 +132,6 @@ const renderUnusedMarker = function () {
   }
 };
 
-const modifyStorageValueOfUnusedMarker = function () {
-  if (!UnusedMarker.isOnMap) {
-    localStorage.setItem('marker', ',');
-  } else
-    localStorage.setItem(
-      'marker',
-      `${UnusedMarker.instance.lat},${UnusedMarker.instance.lng}`
-    );
-};
-
 //////////////////////////////////////////
 
 if (navigator && navigator.geolocation) {

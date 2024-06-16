@@ -1,47 +1,51 @@
 import * as L from 'leaflet';
+import { storageAvailable } from '../data/utilityFuncs';
 
 class Marker {
   //this type of declarations are not part of js lang till now, but will probably be in future
   //supported in chrome
-  #Lvar: L;
-  #map: L.Map;
-  #lat;
-  #lng;
-  constructor(Lvar, map, lat, lng) {
-    this.#Lvar = Lvar;
+  // above comments are for `#varname` expressions
+  readonly #map: L.Map;
+  #lat: number;
+  #lng: number;
+  protected _markerPin: L.Marker | undefined;
+
+  constructor(map: L.Map, lat: number, lng: number) {
     this.#map = map;
-    this.attachToMapCoords(lat, lng);
-  }
-  get lat() {
-    return this.#lat;
-  }
-  get lng() {
-    return this.#lng;
-  }
-  get Lvar() {
-    return this.#Lvar;
-  }
-  get map() {
-    return this.#map;
-  }
-  attachToMapCoords(lat, lng) {
     this.#lat = lat;
     this.#lng = lng;
-    const thisObj = this.#Lvar.marker.call(globalThis, [lat, lng]);
-    this.markerPin = thisObj.addTo.call(thisObj, this.#map);
+  }
+
+  get lat(): number {
+    return this.#lat;
+  }
+  get lng(): number {
+    return this.#lng;
+  }
+  get map(): L.Map {
+    return this.#map;
+  }
+
+  attachToMapCoords(lat: number, lng: number) {
+    this.removeFromMap();
+    const thisObj = globalThis?.L.marker.call(globalThis, [lat, lng]);
+    this._markerPin = thisObj?.addTo.call(thisObj, this.#map);
+    this.#lat = lat;
+    this.#lng = lng;
   }
   removeFromMap() {
-    this.markerPin.remove();
+    this._markerPin?.remove();
   }
 }
 
 //singleton class
 //class for marker not associated with any task
-class UnusedMarker extends Marker {
-  static instance = null;
+export class UnusedMarker extends Marker {
+  public static instance: UnusedMarker | null = null;
   static #isOnMap = false;
-  constructor(Lvar, map, lat, lng) {
-    super(Lvar, map, lat, lng);
+
+  constructor(map: L.Map, lat: number, lng: number) {
+    super(map, lat, lng);
     UnusedMarker.#isOnMap = true;
     if (UnusedMarker.instance instanceof UnusedMarker) {
       return UnusedMarker.instance;
@@ -49,13 +53,43 @@ class UnusedMarker extends Marker {
     UnusedMarker.instance = this;
     return UnusedMarker.instance;
   }
-  attachToMapCoords(lat, lng) {
+
+  private storeUnusedMarkerCoords() {
+    if (UnusedMarker.instance?.lat && UnusedMarker.instance?.lng) {
+      localStorage.setItem(
+        'marker',
+        `${UnusedMarker.instance?.lat},${UnusedMarker.instance?.lng}`
+      );
+    } else {
+      localStorage.setItem('marker', `,`);
+    }
+  }
+
+  attachToMapCoords(lat: number, lng: number) {
     super.attachToMapCoords(lat, lng);
+    this.storeUnusedMarkerCoords();
     UnusedMarker.#isOnMap = true;
   }
+
   removeFromMap() {
     super.removeFromMap();
     UnusedMarker.#isOnMap = false;
+  }
+
+  attachToPrevMapCoords() {
+    if (storageAvailable('localStorage')) {
+      if (!localStorage.getItem('marker')) {
+        localStorage.setItem('marker', ',');
+        return;
+      }
+
+      const val = localStorage.getItem('marker');
+      if (val === ',') return;
+
+      let [lat, lng] = (val?.split(',') ?? ['', '']).map(Number.parseFloat);
+
+      UnusedMarker.instance?.attachToMapCoords(lat, lng);
+    }
   }
 
   static get isOnMap() {
@@ -65,17 +99,25 @@ class UnusedMarker extends Marker {
 
 //marker with some task on it
 //Used Marker = Marker+some popup data
-class UsedMarker extends Marker {
-  static total = 0;
+export class UsedMarker extends Marker {
+  public static total = 0;
 
-  constructor(Lvar, map, lat, lng, date, time, type) {
-    super(Lvar, map, lat, lng);
+  constructor(
+    map: L.Map,
+    lat: number,
+    lng: number,
+    date: any,
+    time: any,
+    type: any
+  ) {
+    super(map, lat, lng);
     UsedMarker.total++;
     this.attachPopUp(date, time, type);
   }
-  attachPopUp(date, time, type) {
-    this.markerPin
-      .bindPopup(
+
+  attachPopUp(date: any, time: any, type: any) {
+    this._markerPin
+      ?.bindPopup(
         L.popup({
           autoClose: false,
           closeOnClick: false,
