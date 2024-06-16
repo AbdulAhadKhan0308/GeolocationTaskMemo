@@ -1,8 +1,12 @@
 import * as React from 'react';
 import * as L from 'leaflet';
 import { UnusedMarker } from '../markers/MarkerClasses';
+import { MapProps } from '../types';
 
-export const Map: React.FC = () => {
+export const Map: React.FC<MapProps> = ({
+  setFormVisible,
+  formDateInputRef,
+}) => {
   React.useEffect(() => {
     if (navigator?.geolocation) {
       console.log('navigator.geolocation exists');
@@ -29,8 +33,8 @@ export const Map: React.FC = () => {
 
           map.on('click', function (mapEvent) {
             console.log('map clicked');
-            //   form.classList.remove('hidden');
-            //   dateInput.focus();
+            setFormVisible(true);
+            formDateInputRef.current?.focus();
             const { lat, lng } = mapEvent.latlng;
             UnusedMarker.instance?.attachToMapCoords(lat, lng);
           });

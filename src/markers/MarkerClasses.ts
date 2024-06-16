@@ -1,7 +1,6 @@
 import * as L from 'leaflet';
-import { storageAvailable } from '../data/utilityFuncs';
 
-class Marker {
+abstract class Marker {
   //this type of declarations are not part of js lang till now, but will probably be in future
   //supported in chrome
   // above comments are for `#varname` expressions
@@ -77,19 +76,17 @@ export class UnusedMarker extends Marker {
   }
 
   attachToPrevMapCoords() {
-    if (storageAvailable('localStorage')) {
-      if (!localStorage.getItem('marker')) {
-        localStorage.setItem('marker', ',');
-        return;
-      }
-
-      const val = localStorage.getItem('marker');
-      if (val === ',') return;
-
-      let [lat, lng] = (val?.split(',') ?? ['', '']).map(Number.parseFloat);
-
-      UnusedMarker.instance?.attachToMapCoords(lat, lng);
+    if (!localStorage.getItem('marker')) {
+      localStorage.setItem('marker', ',');
+      return;
     }
+
+    const val = localStorage.getItem('marker');
+    if (val === ',') return;
+
+    let [lat, lng] = (val?.split(',') ?? ['', '']).map(Number.parseFloat);
+
+    UnusedMarker.instance?.attachToMapCoords(lat, lng);
   }
 
   static get isOnMap() {
