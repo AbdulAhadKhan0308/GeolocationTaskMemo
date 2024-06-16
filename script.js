@@ -11,94 +11,6 @@ const memoElem = document.querySelector('.memo');
 let globalUsedMarkersArray = [];
 //////////////////////////////////////////////
 
-class Marker {
-  //this type of declarations are not part of js lang till now, but will probably be in future
-  //supported in chrome
-  #Lvar;
-  #map;
-  #lat;
-  #lng;
-  constructor(Lvar, map, lat, lng) {
-    this.#Lvar = Lvar;
-    this.#map = map;
-    this.attachToMapCoords(lat, lng);
-  }
-  get lat() {
-    return this.#lat;
-  }
-  get lng() {
-    return this.#lng;
-  }
-  get Lvar() {
-    return this.#Lvar;
-  }
-  get map() {
-    return this.#map;
-  }
-  attachToMapCoords(lat, lng) {
-    this.#lat = lat;
-    this.#lng = lng;
-    const thisObj = this.#Lvar.marker.call(globalThis, [lat, lng]);
-    this.markerPin = thisObj.addTo.call(thisObj, this.#map);
-  }
-  removeFromMap() {
-    this.markerPin.remove();
-  }
-}
-
-//singleton class
-//class for marker not associated with any task
-class UnusedMarker extends Marker {
-  static instance = null;
-  static #isOnMap = false;
-  constructor(Lvar, map, lat, lng) {
-    super(Lvar, map, lat, lng);
-    UnusedMarker.#isOnMap = true;
-    if (UnusedMarker.instance instanceof UnusedMarker) {
-      return UnusedMarker.instance;
-    }
-    UnusedMarker.instance = this;
-    return UnusedMarker.instance;
-  }
-  attachToMapCoords(lat, lng) {
-    super.attachToMapCoords(lat, lng);
-    UnusedMarker.#isOnMap = true;
-  }
-  removeFromMap() {
-    super.removeFromMap();
-    UnusedMarker.#isOnMap = false;
-  }
-
-  static get isOnMap() {
-    return UnusedMarker.#isOnMap;
-  }
-}
-
-//marker with some task on it
-//Used Marker = Marker+some popup data
-class UsedMarker extends Marker {
-  static total = 0;
-
-  constructor(Lvar, map, lat, lng, date, time, type) {
-    super(Lvar, map, lat, lng);
-    UsedMarker.total++;
-    this.attachPopUp(date, time, type);
-  }
-  attachPopUp(date, time, type) {
-    this.markerPin
-      .bindPopup(
-        L.popup({
-          autoClose: false,
-          closeOnClick: false,
-          className: `${type}-popup`,
-        })
-      )
-      .setPopupContent(`on ${date} at ${time}`)
-      .openPopup();
-  }
-}
-
-
 ///////////////////////////////////////////
 //could be done with a "visible class" from css for the "other" form field that appears only one one of them
 const modifyOtherLabel = function (val) {
@@ -121,37 +33,6 @@ const modifyOtherLabel = function (val) {
     formLabelOther.innerHTML = 'Comment';
     formInputOther.placeholder = '...';
   }
-};
-
-const isValidDate = function (date) {
-  if (date.length > 10 || date.length < 10) return false;
-
-  let i = 0;
-  for (i = 0; i < date.length; i++) {
-    if (i != 4 && i != 7 && !date.charAt(i).match(/[0-9]/)) break;
-  }
-  if (i != date.length) return false;
-
-  const dateOnly = parseInt(date.slice(8, 10));
-  const month = parseInt(date.slice(5, 7));
-  const year = parseInt(date.slice(0, 4));
-
-  if (year > 2050 || year < 1950 || month > 12 || month < 1) return false;
-  if (month != 2) {
-    if ((month % 2 && month < 8) || (month % 2 == 0 && month > 7)) {
-      if (dateOnly < 1 || dateOnly > 31) return false;
-    } else {
-      if (dateOnly < 1 || dateOnly > 30) return false;
-    }
-  }
-  if (month == 2) {
-    if (
-      (year % 4 && (dateOnly < 1 || dateOnly > 28)) ||
-      (year % 4 == 0 && (dateOnly < 1 || dateOnly > 29))
-    )
-      return false;
-  }
-  return true;
 };
 
 //LOCAL STORAGE
@@ -180,18 +61,18 @@ const renderList = function () {
   globalUsedMarkersArray = [];
 
   //retrieve elements form localStorage and insert in memoElem
-  console.log("localStorage.length",localStorage.length);
+  console.log('localStorage.length', localStorage.length);
 
   for (let i = 0; i < localStorage.length; i++) {
     const keyCol = localStorage.key(i);
-    console.log("keyCol",keyCol);
+    console.log('keyCol', keyCol);
 
     if (keyCol !== 'marker') {
-      console.log("no marker")
+      console.log('no marker');
       const obj = JSON.parse(localStorage.getItem(keyCol));
-      console.log("obj",obj);
+      console.log('obj', obj);
       const { date, time, lat, lng, className } = obj;
-      console.log("className",className);
+      console.log('className', className);
 
       let OtherProperty = Object.values(obj)[5];
       if (!OtherProperty) OtherProperty = '';
