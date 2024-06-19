@@ -164,51 +164,8 @@ if (navigator && navigator.geolocation) {
   );
 }
 
-form.addEventListener('click', e => {
-  e.preventDefault();
-  if (e.target === formBtn) {
-    const timeReg = /^(([0-1][0-9])|([2][0-3])):[0-5][0-9]$/g;
-
-    if (timeInput.value.match(timeReg) && isValidDate(dateInput.value)) {
-      const unusedMarker = UnusedMarker.instance;
-      //create obj
-      let obj;
-      const date = dateInput.value;
-      const time = timeInput.value;
-      const other = formInputOther.value;
-      const { lat, lng } = unusedMarker;
-
-      if (formInputType.value === 'study')
-        obj = new Study(date, time, lat, lng, other);
-      else if (formInputType.value === 'shop')
-        obj = new Shop(date, time, lat, lng, other);
-      else if (formInputType.value === 'business-meet')
-        obj = new BusinessMeet(date, time, lat, lng, other);
-      else if (formInputType.value === 'friend-meet')
-        obj = new FriendMeet(date, time, lat, lng, other);
-      else if (formInputType.value === 'workout')
-        obj = new Workout(date, time, lat, lng, other);
-      else obj = new OtherTask(date, time, lat, lng, other);
-
-      //store in localStorage
-      if (storageAvailable('localStorage')) {
-        //for IDing objects
-        const id = Date.now();
-        localStorage.setItem(id, obj.JSONDataObj);
-      }
-
-      form.classList.add('hidden');
-      //render from localStorage
-      renderList();
-
-      unusedMarker.removeFromMap();
-      modifyStorageValueOfUnusedMarker();
-    }
-  }
-  if (e.target === formInputType) {
-    modifyOtherLabel(e.target.value);
-  }
-});
+// form.addEventListener('click',
+// });
 
 memoElem.addEventListener('click', e => {
   e.preventDefault();

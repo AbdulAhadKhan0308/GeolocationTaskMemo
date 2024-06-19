@@ -8,7 +8,7 @@ export const App: React.FC = () => {
 
   return (
     <>
-      <div id="first-child">{'focus changed in reacted'}</div>
+      <div id="first-child">{'hihi changed in reacted'}</div>
       <SideBar formVisible={formVisible} formDateInputRef={formDateInputRef} />
       <Map
         setFormVisible={setFormVisible}
