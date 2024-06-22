@@ -53,16 +53,19 @@ export const Map: React.FC<MapProps> = ({
 
   React.useEffect(() => {
     const usedMarkerRefs: UsedMarker[] = [];
+    console.log('tasks in map', tasks);
     if (!mapRef) return;
     for (let i = 0; i < tasks.length; i++) {
       const task = tasks[i];
-      new UsedMarker(
-        mapRef,
-        task.lat,
-        task.lng,
-        task.date,
-        task.time,
-        task.type
+      usedMarkerRefs.push(
+        new UsedMarker(
+          mapRef,
+          task.lat,
+          task.lng,
+          task.date,
+          task.time,
+          task.type
+        )
       );
     }
     return () => {

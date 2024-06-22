@@ -1,3 +1,2 @@
-no lock file
-localStorage uses .key(), if other keys were setup in the page by an extension etc., it would fail
+no unique key in memo child
 find a good way to use storageAvailable function

@@ -26,9 +26,9 @@ export const Tasks: React.FC<TasksProps> = ({
 
   React.useEffect(() => {
     const items = useGetItemsFromLocalStorage('tasks');
-    console.log('items', items);
-    const taskItems = !!items && parseValidateTaskItems(items);
-    console.log('taskItems', taskItems);
+    const taskItems = parseValidateTaskItems(
+      !!items ? items : JSON.stringify([])
+    );
     if (taskItems) setTasks(taskItems);
     else throw new Error('taskItems is invalid');
   }, [formVisible]);
