@@ -1,18 +1,13 @@
 import * as React from 'react';
-import { FormProps } from '../types';
-import { isValidDate } from '../data/utilityFuncs';
+import { FormProps, Task } from '../types';
+import { isValidDate, isValidTime, validateTasks } from '../data/utilityFuncs';
 import { UnusedMarker } from '../markers/MarkerClasses';
-import {
-  BusinessMeet,
-  FriendMeet,
-  OtherTask,
-  Shop,
-  Study,
-  Workout,
-} from '../data/taskClasses';
+import { useLocalStorage } from './hooks/useLocalStorage';
+import { useTasks } from './hooks/useTasksContext';
 
 export const Form: React.FC<FormProps> = ({
   formVisible,
+  setFormVisible,
   formDateInputRef,
 }) => {
   const [selectedOption, setSelectedOption] = React.useState<string>('study');
@@ -34,6 +29,9 @@ export const Form: React.FC<FormProps> = ({
     setFormTimeInputValue((e.target as HTMLInputElement).value);
   const handleOtherInputChange = (e: React.SyntheticEvent) =>
     setFormOtherInputValue((e.target as HTMLInputElement).value);
+
+  const { tasks } = useTasks();
+  const { useSetItemsLocalStorage } = useLocalStorage();
 
   const modifyFormField = function (val: string) {
     if (val === 'study') {
@@ -57,50 +55,79 @@ export const Form: React.FC<FormProps> = ({
     }
   };
 
-  const handleClick = (e: React.SyntheticEvent) => {
+  const handleClick = (e: React.SyntheticEvent<HTMLElement>) => {
     e.preventDefault();
-    if ((e.target as HTMLElement).id === 'form-submit-btn') {
-      // const timeReg = /^(([0-1][0-9])|([2][0-3])):[0-5][0-9]$/g;
-      // if (!UnusedMarker.instance)
-      //   throw new Error('UnusedMarker not instantiated');
-      // if (
-      //   formTimeInputValue.match(timeReg) &&
-      //   isValidDate(formDateInputValue)
-      // ) {
-      //   const unusedMarker = UnusedMarker.instance;
-      //   //create obj
-      //   let obj;
-      //   const date = formDateInputValue;
-      //   const time = formTimeInputValue;
-      //   const other = formOtherInputValue;
-      //   const { lat, lng } = unusedMarker;
-      //   if (selectedOption === 'study')
-      //     obj = new Study(date, time, lat, lng, other);
-      //   else if (selectedOption === 'shop')
-      //     obj = new Shop(date, time, lat, lng, other);
-      //   else if (selectedOption === 'business-meet')
-      //     obj = new BusinessMeet(date, time, lat, lng, other);
-      //   else if (selectedOption === 'friend-meet')
-      //     obj = new FriendMeet(date, time, lat, lng, other);
-      //   else if (selectedOption === 'workout')
-      //     obj = new Workout(date, time, lat, lng, other);
-      //   else obj = new OtherTask(date, time, lat, lng, other);
-      //   // //store in localStorage
-      //   // if (storageAvailable('localStorage')) {
-      //   //   //for IDing objects
-      //   //   const id = Date.now();
-      //   //   localStorage.setItem(id, obj.JSONDataObj);
-      //   // }
-      //   // form.classList.add('hidden');
-      //   // //render from localStorage
-      //   // renderList();
-      //   // unusedMarker.removeFromMap();
-      //   // modifyStorageValueOfUnusedMarker();
+    if (
+      e.target instanceof HTMLButtonElement &&
+      e.target.id === 'form-submit-btn'
+    ) {
+      if (!UnusedMarker.instance)
+        throw new Error('UnusedMarker not instantiated');
+
+      if (!(isValidTime(formTimeInputValue) && isValidDate(formDateInputValue)))
+        throw new Error('date or time input invalid');
+
+      const unusedMarker = UnusedMarker.instance;
+
+      const date = formDateInputValue;
+      const time = formTimeInputValue;
+      const other = formOtherInputValue;
+      const { lat, lng } = unusedMarker;
+      const obj: any = {
+        date,
+        time,
+        lat,
+        lng,
+      };
+
+      if (selectedOption === 'study') {
+        obj.type = 'Study';
+        obj.course = other;
+      } else if (selectedOption === 'other-task') {
+        obj.type = 'OtherTask';
+        obj.comment = other;
+      } else {
+        let otherNum;
+        try {
+          otherNum = parseInt(other);
+        } catch (_e) {
+          throw new Error('number input invalid');
+        }
+        if (selectedOption === 'shop') {
+          obj.type = 'Shop';
+          obj.budget = otherNum;
+        } else if (selectedOption === 'business-meet') {
+          obj.type = 'BusinessMeet';
+          obj.success = otherNum;
+        } else if (selectedOption === 'friend-meet') {
+          obj.type = 'FriendMeet';
+          obj.expenses = otherNum;
+        } else if (selectedOption === 'workout') {
+          obj.type = 'Workout';
+          obj.caloriesBurnt = otherNum;
+        }
+      }
+
+      console.log('obj', obj);
+      if (!validateTasks([obj])) throw new Error('input invalid');
+
+      // //store in localStorage
+      // if (storageAvailable('localStorage')) {
+      //   //for IDing objects
+      //   const id = Date.now();
+      //   localStorage.setItem(id, obj.JSONDataObj);
       // }
+
+      const newTasks = [...tasks, obj as Task];
+      useSetItemsLocalStorage('tasks', JSON.stringify(newTasks));
+      setFormVisible(false);
+      unusedMarker.removeFromMap();
     }
-    if ((e.target as HTMLSelectElement).id === 'form-input-type') {
+    if (
+      e.target instanceof HTMLSelectElement &&
+      e.target.id === 'form-input-type'
+    ) {
       modifyFormField((e.target as HTMLSelectElement).value);
-      console.log('inputtype clicked');
     }
   };
 

@@ -30,6 +30,12 @@ export const isValidDate = function (date: string) {
   return true;
 };
 
+//valid input woud be hh:mm format
+export function isValidTime(time: string) {
+  const timeRegex = /^([01]?[0-9]|2[0-3]):([0-5]?[0-9])$/;
+  return timeRegex.test(time);
+}
+
 export function storageAvailable(type: 'localStorage' | 'sessionStorage') {
   let storage;
   try {
@@ -42,3 +48,46 @@ export function storageAvailable(type: 'localStorage' | 'sessionStorage') {
     return false;
   }
 }
+
+export const validateTasks: (tasks: any) => boolean = tasks => {
+  if (!Array.isArray(tasks)) return false;
+
+  for (let i = 0; i < tasks.length; i++) {
+    const task = tasks[i];
+    if (
+      !(
+        task?.date &&
+        typeof task.date === 'string' &&
+        task?.time &&
+        typeof task.time === 'string'
+      )
+    )
+      return false;
+
+    switch (task?.type) {
+      case 'Study':
+        if (!(task?.course === 'Yes' || task?.course === 'No')) return false;
+        continue;
+      case 'Shop':
+        if (!(task?.budget && typeof task.budget === 'number')) return false;
+        continue;
+      case 'BusinessMeet':
+        if (!(task?.success && typeof task.success === 'number')) return false;
+        continue;
+      case 'FriendMeet':
+        if (!(task?.expenses && typeof task.expenses === 'number'))
+          return false;
+        continue;
+      case 'Workout':
+        if (!(task?.caloriesBurnt && typeof task.caloriesBurnt === 'number'))
+          return false;
+        continue;
+      case 'OtherTask':
+        if (!(task?.comment && typeof task.comment === 'string')) return false;
+        continue;
+      default:
+        return false;
+    }
+  }
+  return true;
+};

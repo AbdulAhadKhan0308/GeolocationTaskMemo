@@ -54,7 +54,10 @@ export class UnusedMarker extends Marker {
   }
 
   private storeUnusedMarkerCoords() {
-    if (UnusedMarker.instance?.lat && UnusedMarker.instance?.lng) {
+    if (
+      (UnusedMarker.instance?.lat || UnusedMarker.instance?.lat === 0) &&
+      (UnusedMarker.instance?.lng || UnusedMarker.instance?.lng === 0)
+    ) {
       localStorage.setItem(
         'marker',
         `${UnusedMarker.instance?.lat},${UnusedMarker.instance?.lng}`
@@ -72,6 +75,7 @@ export class UnusedMarker extends Marker {
 
   removeFromMap() {
     super.removeFromMap();
+    localStorage.setItem('marker', ',');
     UnusedMarker.#isOnMap = false;
   }
 
@@ -108,8 +112,9 @@ export class UsedMarker extends Marker {
     type: any
   ) {
     super(map, lat, lng);
-    UsedMarker.total++;
+    this.attachToMapCoords(lat, lng);
     this.attachPopUp(date, time, type);
+    UsedMarker.total++;
   }
 
   attachPopUp(date: any, time: any, type: any) {
