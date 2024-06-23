@@ -27,6 +27,9 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
   },
   resolve: {
+    alias: {
+      leaflet: path.resolve(__dirname, 'customModules/leaflet'),
+    },
     //first priortiy is
     //looking through current directory's src
     //second priority is
